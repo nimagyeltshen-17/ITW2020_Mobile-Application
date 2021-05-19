@@ -16,12 +16,19 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
     private EditText mEmail, mPassword;
     private Button login_btn;
     private FirebaseAuth firebaseAuth;
     private Context context = LoginActivity.this;
+    private DatabaseReference reference;
+    String licenseNo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +36,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        reference = FirebaseDatabase.getInstance().getReference("Users");
 
         mEmail = (EditText)findViewById(R.id.Email);
         mPassword = (EditText)findViewById(R.id.Password);
@@ -47,6 +55,21 @@ public class LoginActivity extends AppCompatActivity {
                 else{
                     String email = mEmail.getText().toString().trim();
                     String password = mPassword.getText().toString().trim();
+                    reference.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            for(DataSnapshot db : snapshot.getChildren()){
+                                if(db.child("email").getValue().equals(email)){
+                                    licenseNo = db.child("license").getValue(String.class);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
                     firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
@@ -57,7 +80,12 @@ public class LoginActivity extends AppCompatActivity {
                             else{
                                 if(firebaseAuth.getCurrentUser().isEmailVerified()){
                                     progressDialog.dismiss();
-                                    Toast.makeText(LoginActivity.this, "Login successful",Toast.LENGTH_SHORT).show();
+                                    finish();
+                                    Intent intent = new Intent(LoginActivity.this,UserDashboardActivity.class);
+                                    intent.putExtra("Email",email);
+                                    intent.putExtra("License",licenseNo);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    startActivity(intent);
                                 }
                                 else{
                                     progressDialog.dismiss();
@@ -98,6 +126,16 @@ public class LoginActivity extends AppCompatActivity {
         }
         return true;
     }
+
+//    //Checks user is login or not
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        if(firebaseAuth.getCurrentUser() != null){
+//            finish();
+//            startActivity(new Intent(this,UserDashboardActivity.class));
+//        }
+//    }
 
     //Go to Register page
     public void GoToRegisterPage(View view) {

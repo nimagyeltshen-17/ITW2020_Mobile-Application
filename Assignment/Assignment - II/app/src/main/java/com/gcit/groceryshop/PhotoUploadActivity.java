@@ -20,7 +20,12 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
@@ -30,24 +35,50 @@ import com.squareup.picasso.Picasso;
 public class PhotoUploadActivity extends AppCompatActivity {
 
     //Declare all required variable
+    private FirebaseAuth firebaseAuth;
     private EditText mTitle, mShopName, mContact;
     private Button mChooseBtn, mUploadBtn;
     private ImageView uploadPhoto;
     private Context context = PhotoUploadActivity.this;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri uploadPhotoUri;
-    private DatabaseReference reference;
+    private DatabaseReference reference, reference1;
+    String licenseNo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_upload);
 
+        //Get value from Login activity
+        String email = getIntent().getStringExtra("Email");
+
         //Instantiate all the variable with XML
+        firebaseAuth = FirebaseAuth.getInstance();
+        reference = FirebaseDatabase.getInstance().getReference("Users");
+        reference1 = FirebaseDatabase.getInstance().getReference("Uploads");
         mTitle = (EditText) findViewById(R.id.phototitle);
         mShopName = (EditText)findViewById(R.id.shopname);
         mContact = (EditText)findViewById(R.id.contactnumber);
+        uploadPhoto = (ImageView) findViewById(R.id.uploadImage);
         mChooseBtn = (Button) findViewById(R.id.choosefile);
         mUploadBtn = (Button)findViewById(R.id.uploadfile);
+
+        //Get data from realtime database
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot db : snapshot.getChildren()){
+                    if(db.child("email").getValue().equals(email)){
+                        licenseNo = db.child("license").getValue(String.class);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         mChooseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,6 +119,19 @@ public class PhotoUploadActivity extends AppCompatActivity {
                         }
                     },500);
                     Toast.makeText(getApplicationContext(),"Uploaded Successfully", Toast.LENGTH_LONG).show();
+                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference(licenseNo);
+                    String title = mTitle.getText().toString().trim();
+                    String shopName = mShopName.getText().toString().trim();
+                    String contact = mContact.getText().toString().trim();
+                    PhotoUploadHelperClass photo = new PhotoUploadHelperClass(title, shopName, contact,taskSnapshot.getUploadSessionUri().toString());
+                    String photoId = databaseReference.push().getKey();
+                    databaseReference.child(title).setValue(photo);
+                    reference1.push().setValue(photo);
+
+                    //Clear editText
+                    mTitle.setText("");
+                    mShopName.setText("");
+                    mContact.setText("");
                     progressDialog.dismiss();
                 }
             }).addOnFailureListener(new OnFailureListener() {
