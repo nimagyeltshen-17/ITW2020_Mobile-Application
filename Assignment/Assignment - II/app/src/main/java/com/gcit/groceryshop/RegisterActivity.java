@@ -20,31 +20,26 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.util.regex.Pattern;
+
 public class RegisterActivity extends AppCompatActivity {
 
     //All Variable Declaration
-    private EditText mFullName, mEmail, mLicense, mAddress, mPassword, mConfirmPassword;
+    private EditText mFullName, mEmail, mLicense, mAddress, mContactNumber, mShopName, mPassword, mConfirmPassword;
     private Button signup_btn;
-    private FirebaseAuth firebaseAuth;
-    private FirebaseDatabase rootNode;
-    private DatabaseReference reference;
-    private Context context = RegisterActivity.this;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        //Instantiate the variables with Firebase
-        firebaseAuth = FirebaseAuth.getInstance();
-        rootNode = FirebaseDatabase.getInstance();
-        reference = rootNode.getReference("Users");
-
         //Instantiate the variables with XML file
         mFullName = (EditText) findViewById(R.id.FullName);
         mEmail = (EditText) findViewById(R.id.Email);
         mLicense = (EditText) findViewById(R.id.LicenseNo);
         mAddress = (EditText) findViewById(R.id.Address);
+        mShopName = (EditText) findViewById(R.id.ShopName);
+        mContactNumber = (EditText) findViewById(R.id.ContactNumber);
         mPassword = (EditText) findViewById(R.id.Password);
         mConfirmPassword = (EditText) findViewById(R.id.ConfirmPassword);
         signup_btn = (Button) findViewById(R.id.signup_btn);
@@ -53,12 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
         signup_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProgressDialog progressDialog = new ProgressDialog(context);
-                progressDialog.setTitle("Please wait");
-                progressDialog.setMessage("Registering...");
-                progressDialog.show();
-                if(!validateFullName() | !validateEmail() | !validateLicense() | !validateAddress() | !validatePassword()){
-                    progressDialog.dismiss();
+                if(!validateFullName() | !validateEmail() | !validateLicense() | !validateAddress() | !validateShopName() | !validateContact() | !validatePassword()){
                     return;
                 }
                 else{
@@ -66,34 +56,28 @@ public class RegisterActivity extends AppCompatActivity {
                     String email = mEmail.getText().toString().trim();
                     String license = mLicense.getText().toString().trim();
                     String address = mAddress.getText().toString().trim();
+                    String shopName = mShopName.getText().toString().trim();
+                    String number = mContactNumber.getText().toString().trim();
                     String password = mPassword.getText().toString().trim();
-                    firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if(task.isSuccessful()){
-                                FirebaseUser user = firebaseAuth.getCurrentUser();
-                                user.sendEmailVerification().addOnCompleteListener(RegisterActivity.this, new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        progressDialog.dismiss();
-                                        RegisterHelperClass newUser = new RegisterHelperClass(fullName, email, license, address, password);
-                                        reference.child(license).setValue(newUser);
-                                        Toast.makeText(getApplicationContext(),"The verification link has been successfully sent to your Email" + email, Toast.LENGTH_LONG).show();
-                                        mFullName.setText("");
-                                        mEmail.setText("");
-                                        mLicense.setText("");
-                                        mAddress.setText("");
-                                        mPassword.setText("");
-                                        mConfirmPassword.setText("");
-                                    }
-                                });
-                            }
-                            else{
-                                progressDialog.dismiss();
-                                Toast.makeText(getApplicationContext(),task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
+                    Intent intent = new Intent(getApplicationContext(),RegisterImageUploadActivity.class);
+                    intent.putExtra("FullName",fullName);
+                    intent.putExtra("Email",email);
+                    intent.putExtra("License",license);
+                    intent.putExtra("Address",address);
+                    intent.putExtra("ShopName",shopName);
+                    intent.putExtra("Number",number);
+                    intent.putExtra("Password",password);
+                    startActivity(intent);
+                    finish();
+                    mFullName.setText("");
+                    mEmail.setText("");
+                    mLicense.setText("");
+                    mAddress.setText("");
+                    mShopName.setText("");
+                    mContactNumber.setText("");
+                    mPassword.setText("");
+                    mConfirmPassword.setText("");
+
                 }
             }
         });
@@ -147,6 +131,34 @@ public class RegisterActivity extends AppCompatActivity {
         if(val.isEmpty()){
             mAddress.setError("Address is Required!");
             mAddress.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    //Validate Shop Name
+    private boolean validateShopName() {
+        String val = mShopName.getText().toString().trim();
+        if(val.isEmpty()){
+            mShopName.setError("Shop Name is Required!");
+            mShopName.requestFocus();
+            return false;
+        }
+        return true;
+    }
+
+    //Validate phone number
+    private boolean validateContact() {
+        String val = mContactNumber.getText().toString().trim();
+        final Pattern BPHONE_NUMBER = Pattern.compile("[1][7][0-9]{6}",Pattern.CASE_INSENSITIVE);
+        if(val.isEmpty()){
+            mContactNumber.setError("Contact number is Required!");
+            mContactNumber.requestFocus();
+            return false;
+        }
+        else if(!BPHONE_NUMBER.matcher(val).matches()){
+            mContactNumber.setError("Invalid Contact Number");
+            mContactNumber.requestFocus();
             return false;
         }
         return true;

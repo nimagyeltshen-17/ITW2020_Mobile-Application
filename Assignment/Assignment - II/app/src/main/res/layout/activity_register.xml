@@ -68,6 +68,34 @@
             android:paddingBottom="10dp" />
 
         <EditText
+            android:id="@+id/ShopName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/inputbackground"
+            android:hint="Shop Name"
+            android:padding="10dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp" />
+
+        <EditText
+            android:id="@+id/ContactNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/inputbackground"
+            android:hint="Contact"
+            android:padding="10dp"
+            android:paddingLeft="20dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp" />
+
+        <EditText
             android:id="@+id/Address"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -128,7 +156,7 @@
             android:gravity="center"
             android:onClick="GoToLoginPage"
             android:padding="10dp"
-            android:text="Already have Account? Click here to login"
+            android:text="Already have Account? login Here"
             android:textAlignment="center"
             android:textColor="@color/white" />
 

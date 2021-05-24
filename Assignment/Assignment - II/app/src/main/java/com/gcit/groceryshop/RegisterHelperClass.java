@@ -2,7 +2,7 @@ package com.gcit.groceryshop;
 
 public class RegisterHelperClass {
     //All variable declaration
-    private String FullName, Email, License, Address, Password;
+    private String FullName, Email, License, Address, ShopName, Contact, Password, PhotoUri;
     public RegisterHelperClass(){
 
     }
@@ -47,11 +47,38 @@ public class RegisterHelperClass {
         Password = password;
     }
 
-    public RegisterHelperClass(String FullName, String Email, String License, String Address, String Password){
+    public String getShopName() {
+        return ShopName;
+    }
+
+    public void setShopName(String shopName) {
+        ShopName = shopName;
+    }
+
+    public String getContact() {
+        return Contact;
+    }
+
+    public void setContact(String contact) {
+        Contact = contact;
+    }
+
+    public String getPhotoUri() {
+        return PhotoUri;
+    }
+
+    public void setPhotoUri(String photoUri) {
+        PhotoUri = photoUri;
+    }
+
+    public RegisterHelperClass(String FullName, String Email, String License, String Address, String ShopName, String Contact, String Password, String photo){
         this.FullName = FullName;
         this.Email = Email;
         this.License = License;
         this.Address = Address;
+        this.ShopName = ShopName;
+        this.Contact = Contact;
         this.Password = Password;
+        this.PhotoUri = photo;
     }
 }

@@ -21,6 +21,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class UserDashboardActivity extends AppCompatActivity implements Navigati
         //Get data from dashboard
         email = getIntent().getStringExtra("Email");
         license = getIntent().getStringExtra("License");
+        databaseReference = FirebaseDatabase.getInstance().getReference(license);
 
         //Instantiate
         firebaseAuth = FirebaseAuth.getInstance();
@@ -70,9 +72,10 @@ public class UserDashboardActivity extends AppCompatActivity implements Navigati
 
         mRecycleView.setHasFixedSize(true);
         mRecycleView.setLayoutManager(new LinearLayoutManager(this));
+        Query check = databaseReference.orderByChild("title");
         FirebaseRecyclerOptions<PhotoUploadHelperClass> options =
                 new FirebaseRecyclerOptions.Builder<PhotoUploadHelperClass>()
-                        .setQuery(FirebaseDatabase.getInstance().getReference().child("123456"),PhotoUploadHelperClass.class)
+                        .setQuery(check,PhotoUploadHelperClass.class)
                         .build();
         imageAdapter = new ImageAdapter(options);
         mRecycleView.setAdapter(imageAdapter);
@@ -103,11 +106,10 @@ public class UserDashboardActivity extends AppCompatActivity implements Navigati
 
             case R.id.logout:
                 FirebaseAuth.getInstance().signOut();
-                Intent intentHome = new Intent(this,LoginActivity.class);
+                Intent intentHome = new Intent(this,MainActivity.class);
                 startActivity(intentHome);
                 finish();
                 break;
-
         }
         return true;
     }
