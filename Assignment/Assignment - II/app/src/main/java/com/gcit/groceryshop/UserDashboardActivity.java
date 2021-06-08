@@ -101,6 +101,7 @@ public class UserDashboardActivity extends AppCompatActivity implements Navigati
             case R.id.upload:
             Intent intent = new Intent(this,PhotoUploadActivity.class);
             intent.putExtra("Email",email);
+            intent.putExtra("license",license);
             startActivity(intent);
             break;
 

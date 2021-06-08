@@ -147,7 +147,7 @@ public class PhotoUploadActivity extends AppCompatActivity {
                                     String title = mTitle.getText().toString().trim();
                                     String shopName = mShopName.getText().toString().trim();
                                     String contact = mContact.getText().toString().trim();
-                                    PhotoUploadHelperClass photo = new PhotoUploadHelperClass(title, shopName, contact,uri.toString());
+                                    PhotoUploadHelperClass photo = new PhotoUploadHelperClass(title, shopName, contact,uri.toString(),licenseNo);
                                     databaseReference.child(photoId).setValue(photo);
 
                                     //Clear editText

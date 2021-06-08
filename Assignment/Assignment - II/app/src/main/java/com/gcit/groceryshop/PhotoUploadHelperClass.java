@@ -1,12 +1,20 @@
 package com.gcit.groceryshop;
 
 public class PhotoUploadHelperClass {
-    private String Title, ShopName, Contact, PhotoUri;
+    private String Title, ShopName, Contact, PhotoUri, licenseNo;
     public PhotoUploadHelperClass(){
 
     }
 
-    public PhotoUploadHelperClass(String Title, String ShopName, String Contact, String PhotoUri){
+    public String getLicenseNo() {
+        return licenseNo;
+    }
+
+    public void setLicenseNo(String licenseNo) {
+        this.licenseNo = licenseNo;
+    }
+
+    public PhotoUploadHelperClass(String Title, String ShopName, String Contact, String PhotoUri, String licenseNo){
         if(Title.trim().equals("")){
             Title = "No Title";
         }
@@ -20,6 +28,7 @@ public class PhotoUploadHelperClass {
         this.ShopName = ShopName;
         this.Contact = Contact;
         this.PhotoUri = PhotoUri;
+        this.licenseNo = licenseNo;
     }
 
     public String getTitle() {
